@@ -1,6 +1,8 @@
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 
+export const revalidate = 0
+
 // Esta función obtiene todos los datos que necesita el panel
 async function obtenerDatos() {
 
