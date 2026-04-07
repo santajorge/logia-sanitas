@@ -80,7 +80,7 @@ export default function TesoroLayout({ children }) {
             color: '#c8c5b8',
             textDecoration: 'none',
           }}>
-            Egresos
+            Movimientos
           </Link>
         </nav>
 

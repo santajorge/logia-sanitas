@@ -65,8 +65,7 @@ export default function HomePage() {
             maxWidth: '560px', lineHeight: '1.7', marginBottom: '2rem',
             fontFamily: 'Georgia, serif'
           }}>
-            "Forjando la salud como un derecho universal,
-            con Sabiduría, Justicia y Solidaridad"
+            "Forjando la salud como un derecho universal, con Sabiduría, Justicia y Solidaridad"
           </p>
           <a
             href="https://masoneria-argentina.org.ar"
@@ -298,7 +297,7 @@ export default function HomePage() {
           masoneria-argentina.org.ar
         </a>
         <p style={{ fontSize: '11px', color: '#555', marginTop: '1rem' }}>
-          © 2026 Logia Sanitas Sanitatum. Todos los derechos reservados.
+          © 2026 Logia Sanitas Sanitatum. Todos los derechos reservados. Desarrollado por <a href="https://www.instagram.com/santaweb.studio/">Santa Web & UX Studio</a>
         </p>
       </footer>
 
