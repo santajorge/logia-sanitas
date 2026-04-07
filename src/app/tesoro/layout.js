@@ -91,8 +91,8 @@ export default function TesoroLayout({ children }) {
           fontSize: '11px',
           color: '#9e9b8e'
         }}>
-          Bajo los auspicios de la<br />
-          Gran Logia de la Argentina
+          Bajo los auspicios de la <br />
+          Gran Logia de la Argentina de Libres y Aceptados Masones
         </div>
 
       </aside>
