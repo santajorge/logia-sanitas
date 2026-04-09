@@ -51,17 +51,17 @@ export default function HomePage() {
             style={{ marginBottom: '1.5rem', objectFit: 'contain' }}
             priority
           />
-          <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#F5F5F5', marginBottom: '8px', lineHeight: '1.3' }}>
+          <h1 style={{ fontSize: '34px', fontWeight: '700', color: '#F5F5F5', marginBottom: '8px', lineHeight: '1.3' }}>
             Resp.·. Log.·. Sanitas Sanitatum
           </h1>
-          <p style={{ fontSize: '13px', color: '#CDA434', marginBottom: '8px', letterSpacing: '0.1em' }}>
+          <p style={{ fontSize: '14px', color: '#CDA434', marginBottom: '8px', letterSpacing: '0.1em' }}>
             N° 763 · Rosario, Santa Fe · Est. 5 de mayo de 2023 (e.·.v.·.)
           </p>
-          <p style={{ fontSize: '11px', color: '#9e9b8e', marginBottom: '2rem' }}>
+          <p style={{ fontSize: '12px', color: '#9e9b8e', marginBottom: '2rem' }}>
             Bajo los auspicios de la Gran Logia de la Argentina de Libres y Aceptados Masones
           </p>
           <p style={{
-            fontSize: '17px', color: '#F5F5F5', fontStyle: 'italic',
+            fontSize: '18px', color: '#F5F5F5', fontStyle: 'italic',
             maxWidth: '560px', lineHeight: '1.7', marginBottom: '2rem',
             fontFamily: 'Georgia, serif'
           }}>
@@ -84,16 +84,16 @@ export default function HomePage() {
       <section id="nosotros" aria-label="Nuestra historia" style={{ padding: '5rem 2rem', backgroundColor: '#F5F5F5' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <AnimatedSection>
-            <p style={{ fontSize: '11px', color: '#CDA434', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+            <p style={{ fontSize: '12px', color: '#CDA434', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
               Nuestra historia
             </p>
-            <h2 style={{ fontSize: '26px', fontWeight: '700', color: '#1C1C1C', marginBottom: '1.5rem' }}>
+            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1C1C1C', marginBottom: '1.5rem' }}>
               Obreros de la salud
             </h2>
-            <p style={{ fontSize: '15px', color: '#444', lineHeight: '1.9', marginBottom: '1rem', fontFamily: 'Georgia, serif' }}>
+            <p style={{ fontSize: '16px', color: '#444', lineHeight: '1.9', marginBottom: '1rem', fontFamily: 'Georgia, serif' }}>
               La Logia Sanitas Sanitatum fue fundada el 5 de mayo de 2023 (e.·.v.·.) como iniciativa de un grupo de masones pertenecientes al sistema de salud. No solo médicos, sino profesionales y trabajadores de diferentes áreas, todos convocados bajo la certeza de que la salud no puede abordarse desde un solo lugar.
             </p>
-            <p style={{ fontSize: '15px', color: '#444', lineHeight: '1.9', marginBottom: '3rem', fontFamily: 'Georgia, serif' }}>
+            <p style={{ fontSize: '16px', color: '#444', lineHeight: '1.9', marginBottom: '3rem', fontFamily: 'Georgia, serif' }}>
               Lo que comenzó como la idea de un grupo de trabajo y reflexión se convirtió en algo más profundo: un taller donde la piedra bruta del sistema sanitario se pule colectivamente con herramientas masónicas, generando una mirada compleja y holística sobre la salud como derecho inalienable.
             </p>
           </AnimatedSection>
@@ -101,7 +101,7 @@ export default function HomePage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
             <AnimatedSection delay={100}>
               <div style={{ border: '1px solid #CDA434', borderRadius: '4px', padding: '1.5rem', height: '100%' }}>
-                <p style={{ fontSize: '10px', color: '#CDA434', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Misión</p>
+                <p style={{ fontSize: '11px', color: '#CDA434', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: '600' }}>Misión</p>
                 <p style={{ fontSize: '14px', color: '#444', lineHeight: '1.8', fontFamily: 'Georgia, serif' }}>
                   Forjar la salud como un derecho inalienable, mediante la unión de los obreros de la salud y la aplicación de las herramientas masónicas, para construir un ecosistema sanitario justo, equitativo y holístico.
                 </p>
@@ -109,7 +109,7 @@ export default function HomePage() {
             </AnimatedSection>
             <AnimatedSection delay={200}>
               <div style={{ border: '1px solid #CDA434', borderRadius: '4px', padding: '1.5rem', height: '100%' }}>
-                <p style={{ fontSize: '10px', color: '#CDA434', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Visión</p>
+                <p style={{ fontSize: '11px', color: '#CDA434', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: '600' }}>Visión</p>
                 <p style={{ fontSize: '14px', color: '#444', lineHeight: '1.8', fontFamily: 'Georgia, serif' }}>
                   Ser el taller de herreros de la salud, donde se forjan líderes visionarios, capaces de esculpir la piedra bruta de la salud en una joya brillante, que ilumine el camino hacia la soberanía y la dignidad humana.
                 </p>
@@ -125,16 +125,16 @@ export default function HomePage() {
       <section id="masoneria" aria-label="Qué es la masonería" style={{ padding: '5rem 2rem', backgroundColor: '#1C1C1C' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <AnimatedSection>
-            <p style={{ fontSize: '11px', color: '#CDA434', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+            <p style={{ fontSize: '12px', color: '#CDA434', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
               Conocé la institución
             </p>
-            <h2 style={{ fontSize: '26px', fontWeight: '700', color: '#F5F5F5', marginBottom: '1.5rem' }}>
+            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#F5F5F5', marginBottom: '1.5rem' }}>
               ¿Qué es la masonería?
             </h2>
-            <p style={{ fontSize: '15px', color: '#c8c5b8', lineHeight: '1.9', marginBottom: '1rem', fontFamily: 'Georgia, serif' }}>
+            <p style={{ fontSize: '16px', color: '#c8c5b8', lineHeight: '1.9', marginBottom: '1rem', fontFamily: 'Georgia, serif' }}>
               La masonería es la organización fraternal más antigua del mundo. Es una escuela de pensamiento y un sistema de ética basado en la convicción de que cada persona tiene la responsabilidad de mejorarse a sí misma y de contribuir al bien de su entorno. Sus principios fundamentales son la Libertad, la Igualdad y la Fraternidad, sostenidos por el lema: Ciencia, Justicia y Trabajo.
             </p>
-            <p style={{ fontSize: '15px', color: '#c8c5b8', lineHeight: '1.9', marginBottom: '3rem', fontFamily: 'Georgia, serif' }}>
+            <p style={{ fontSize: '16px', color: '#c8c5b8', lineHeight: '1.9', marginBottom: '3rem', fontFamily: 'Georgia, serif' }}>
               No es una religión ni está afiliada a ninguna. Se eleva sobre toda clase de diferencias para ofrecer a los amantes de la verdad un terreno de entendimiento mutuo y unión fraternal, admitiendo en su seno a personas de todas las creencias, profesiones y orígenes.
             </p>
           </AnimatedSection>
@@ -170,13 +170,13 @@ export default function HomePage() {
       <section id="admision" aria-label="Cómo ingresar a la masonería" style={{ padding: '5rem 2rem', backgroundColor: '#F5F5F5' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <AnimatedSection>
-            <p style={{ fontSize: '11px', color: '#CDA434', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+            <p style={{ fontSize: '12px', color: '#CDA434', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
               Sumate
             </p>
-            <h2 style={{ fontSize: '26px', fontWeight: '700', color: '#1C1C1C', marginBottom: '1rem' }}>
+            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1C1C1C', marginBottom: '1rem' }}>
               ¿Cómo ingresar a la logia?
             </h2>
-            <p style={{ fontSize: '15px', color: '#444', lineHeight: '1.9', marginBottom: '2rem', fontFamily: 'Georgia, serif' }}>
+            <p style={{ fontSize: '16px', color: '#444', lineHeight: '1.9', marginBottom: '2rem', fontFamily: 'Georgia, serif' }}>
               Sanitas es una logia simbólica con una identidad muy marcada en torno a la salud, pero como cualquier taller masónico trabaja los mismos grados y enseñanzas de siempre. Nuestra mirada sobre la salud como derecho universal es el prisma desde el que nos acercamos al mundo, no un requisito de admisión. Si compartís esos valores y te interesa crecer junto a una comunidad comprometida, sos bienvenido.
             </p>
           </AnimatedSection>
@@ -198,10 +198,10 @@ export default function HomePage() {
                   <p style={{ fontSize: '28px', fontWeight: '700', color: '#CDA434', marginBottom: '0.5rem', opacity: 0.6 }}>
                     {item.num}
                   </p>
-                  <h3 style={{ fontSize: '15px', fontWeight: '600', color: '#1C1C1C', marginBottom: '0.5rem' }}>
+                  <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1C1C1C', marginBottom: '0.5rem' }}>
                     {item.titulo}
                   </h3>
-                  <p style={{ fontSize: '13px', color: '#666', lineHeight: '1.7', fontFamily: 'Georgia, serif' }}>
+                  <p style={{ fontSize: '14px', color: '#666', lineHeight: '1.7', fontFamily: 'Georgia, serif' }}>
                     {item.texto}
                   </p>
                 </div>
@@ -221,13 +221,13 @@ export default function HomePage() {
       <section id="tenidas" aria-label="Tenidas blancas" style={{ backgroundColor: '#2F4F4F', padding: '5rem 2rem' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <AnimatedSection>
-            <p style={{ fontSize: '11px', color: '#CDA434', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+            <p style={{ fontSize: '12px', color: '#CDA434', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
               Actividades abiertas
             </p>
-            <h2 style={{ fontSize: '26px', fontWeight: '700', color: '#F5F5F5', marginBottom: '1rem' }}>
+            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#F5F5F5', marginBottom: '1rem' }}>
               Tenidas blancas
             </h2>
-            <p style={{ fontSize: '15px', color: '#c8c5b8', lineHeight: '1.8', marginBottom: '2.5rem', fontFamily: 'Georgia, serif' }}>
+            <p style={{ fontSize: '16px', color: '#c8c5b8', lineHeight: '1.8', marginBottom: '2.5rem', fontFamily: 'Georgia, serif' }}>
               Las tenidas blancas son encuentros abiertos donde masones y público en general comparten reflexión, debate y fraternidad en torno a la salud como bien común. Las próximas fechas se publicarán en nuestra web y en Instagram.
             </p>
             <div style={{
@@ -266,10 +266,10 @@ export default function HomePage() {
       <section id="contacto" aria-label="Contacto" style={{ padding: '5rem 2rem', backgroundColor: '#F5F5F5' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <AnimatedSection>
-            <p style={{ fontSize: '11px', color: '#CDA434', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+            <p style={{ fontSize: '12px', color: '#CDA434', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
               Contacto
             </p>
-            <h2 style={{ fontSize: '26px', fontWeight: '700', color: '#1C1C1C', marginBottom: '2rem' }}>
+            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1C1C1C', marginBottom: '2rem' }}>
               Comunicate con nosotros
             </h2>
           </AnimatedSection>
@@ -297,7 +297,7 @@ export default function HomePage() {
           masoneria-argentina.org.ar
         </a>
         <p style={{ fontSize: '11px', color: '#555', marginTop: '1rem' }}>
-          © 2026 Logia Sanitas Sanitatum. Todos los derechos reservados. Desarrollado por <a href="https://www.instagram.com/santaweb.studio/">Santa Web & UX Studio</a>
+          © 2026 Logia Sanitas Sanitatum. Todos los derechos reservados. Desarrollado por <a href="https://www.instagram.com/santaweb.studio/">Santa | Web & UX Studio</a>
         </p>
       </footer>
 
