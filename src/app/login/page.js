@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -46,6 +47,12 @@ export default function LoginPage() {
       padding: '2rem',
       fontFamily: "'Montserrat', system-ui, sans-serif"
     }}>
+
+      <div style={{ width: '100%', maxWidth: '360px', marginBottom: '1rem' }}>
+        <Link href="/" style={{ fontSize: '12px', color: '#9e9b8e', textDecoration: 'none' }}>
+          ← Volver a la web pública
+        </Link>
+      </div>
 
       {/* Logo */}
       <div style={{ marginBottom: '2rem', textAlign: 'center' }}>

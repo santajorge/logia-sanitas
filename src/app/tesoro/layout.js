@@ -1,4 +1,6 @@
 import Link from 'next/link'
+// 1. Importamos el componente que creaste (asegurate de que la ruta sea correcta)
+import BotonLogout from './components/BotonLogout'
 
 export const metadata = {
   title: 'Tesoro — Logia Sanitas Sanitatum N°763',
@@ -53,7 +55,7 @@ export default function TesoroLayout({ children }) {
           </p>
         </div>
 
-        {/* Navegación */}
+        {/* Navegación (El flex: 1 empuja todo lo que está debajo hacia el fondo) */}
         <nav style={{ padding: '1rem 0', flex: 1 }}>
           <Link href="/tesoro" style={{
             display: 'block',
@@ -82,7 +84,22 @@ export default function TesoroLayout({ children }) {
           }}>
             Movimientos
           </Link>
+          {/* Nuevo enlace de Configuración */}
+          <Link href="/tesoro/configuracion" style={{
+            display: 'block',
+            padding: '0.6rem 1.25rem',
+            fontSize: '14px',
+            color: '#c8c5b8',
+            textDecoration: 'none',
+          }}>
+            Configuración
+          </Link>
         </nav>
+
+        {/* 2. Colocamos el Botón de Logout aquí */}
+        <div style={{ padding: '0 1.25rem 1rem' }}>
+          <BotonLogout />
+        </div>
 
         {/* Pie de la barra */}
         <div style={{
