@@ -6,51 +6,51 @@ export const revalidate = 0
 // Esta función obtiene todos los datos que necesita el panel
 async function obtenerDatos() {
 
-  // Traemos todos los hermanos activos junto con su tipo de cuota
-  const { data: hermanos } = await supabase
-    .from('hermanos')
-    .select(`
-      id,
-      nombre,
-      apellido,
-      grado,
-      saldo,
-      activo,
-      exento,
-      exento_hasta,
-      tipos_cuota (
-        nombre
-      )
-    `)
-    .eq('activo', true)
-    .order('apellido')
-
-  // Traemos los egresos del mes actual
   const ahora = new Date()
   const primerDiaMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1)
     .toISOString().split('T')[0]
   const ultimoDiaMes = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0)
     .toISOString().split('T')[0]
 
-  const { data: egresos } = await supabase
-    .from('egresos')
-    .select('monto, categoria, descripcion, fecha')
-    .gte('fecha', primerDiaMes)
-    .lte('fecha', ultimoDiaMes)
-    .order('fecha', { ascending: false })
+  const [
+    { data: hermanos },
+    { data: egresos },
+    { data: pagosMes },
+    { data: ingresosMes }
+  ] = await Promise.all([
+    supabase
+      .from('hermanos')
+      .select(`id, nombre, apellido, grado, saldo, activo, exento, tipos_cuota (nombre)`)
+      .eq('activo', true)
+      .order('apellido'),
+    supabase
+      .from('egresos')
+      .select('monto, categoria, descripcion, fecha')
+      .gte('fecha', primerDiaMes)
+      .lte('fecha', ultimoDiaMes)
+      .order('fecha', { ascending: false }),
+    supabase
+      .from('pagos')
+      .select('monto')
+      .gte('fecha', primerDiaMes)
+      .lte('fecha', ultimoDiaMes),
+    supabase
+      .from('ingresos_varios')
+      .select('monto')
+      .gte('fecha', primerDiaMes)
+      .lte('fecha', ultimoDiaMes)
+  ])
 
-  // Traemos los pagos del mes actual
-  const { data: pagosMes } = await supabase
-    .from('pagos')
-    .select('monto')
-    .gte('fecha', primerDiaMes)
-    .lte('fecha', ultimoDiaMes)
-
-  return { hermanos: hermanos || [], egresos: egresos || [], pagosMes: pagosMes || [] }
+  return {
+    hermanos: hermanos || [],
+    egresos: egresos || [],
+    pagosMes: pagosMes || [],
+    ingresosMes: ingresosMes || []
+  }
 }
 
 export default async function TesoroPage() {
-  const { hermanos, egresos, pagosMes } = await obtenerDatos()
+  const { hermanos, egresos, pagosMes, ingresosMes } = await obtenerDatos()
 
   // Calculamos las métricas
   const totalHermanos = hermanos.length
@@ -58,7 +58,8 @@ export default async function TesoroPage() {
   const conDeuda = hermanos.filter(h => !h.exento && h.saldo < 0).length
   const exentos = hermanos.filter(h => h.exento).length
 
-  const totalIngresosMes = pagosMes.reduce((acc, p) => acc + Number(p.monto), 0)
+  const totalCuotasMes = pagosMes.reduce((acc, p) => acc + Number(p.monto), 0)
+  const totalIngresosMes = totalCuotasMes + ingresosMes.reduce((acc, i) => acc + Number(i.monto), 0)
   const totalEgresosMes = egresos.reduce((acc, e) => acc + Number(e.monto), 0)
   const balanceMes = totalIngresosMes - totalEgresosMes
   const deudaTotal = hermanos
