@@ -52,7 +52,19 @@ export default function PanelLayout({ children }) {
   const veColumnaNorte = esVenerable || rol === '2do Vigilante'
 
   if (cargando) {
-    return <div style={{ minHeight: '100vh', backgroundColor: '#f5f4f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1a1a2e' }}>Cargando el Templo...</div>
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#000000', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#CDA434', fontFamily: 'system-ui, sans-serif' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img 
+          src="/templo-cargando.gif" 
+          alt="Abriendo las Puertas" 
+          style={{ width: '180px', marginBottom: '1.5rem' }} 
+        />
+        <p style={{ fontSize: '13px', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: '500', margin: 0, color: '#CDA434' }}>
+          Abriendo las Puertas del Templo...
+        </p>
+      </div>
+    )
   }
 
   return (
