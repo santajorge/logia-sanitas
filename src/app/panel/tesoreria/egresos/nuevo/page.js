@@ -5,15 +5,15 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 
-const CATEGORIAS = ['Intereses', 'Donación', 'Otros']
+const CATEGORIAS = ['SFU', 'Gran Logia', 'Gastos varios']
 
-export default function NuevoIngresoPage() {
+export default function NuevoEgresoPage() {
   const router = useRouter()
   const [cargando, setCargando] = useState(false)
   const [error, setError] = useState(null)
 
   const [form, setForm] = useState({
-    categoria: 'Intereses',
+    categoria: 'SFU',
     monto: '',
     fecha: new Date().toISOString().split('T')[0],
     descripcion: '',
@@ -41,18 +41,20 @@ export default function NuevoIngresoPage() {
       return
     }
     if (!form.registrado_por.trim()) {
-      setError('Indicá quién está registrando este ingreso.')
+      setError('Indicá quién está registrando este egreso.')
       setCargando(false)
       return
     }
 
-    const { error: err } = await supabase.from('ingresos_varios').insert({
+    const datos = {
       categoria: form.categoria,
       monto: parseFloat(form.monto),
       fecha: form.fecha,
       descripcion: form.descripcion.trim(),
       registrado_por: form.registrado_por.trim(),
-    })
+    }
+
+    const { error: err } = await supabase.from('egresos').insert(datos)
 
     if (err) {
       setError('Ocurrió un error al guardar. Intentá de nuevo.')
@@ -61,41 +63,43 @@ export default function NuevoIngresoPage() {
       return
     }
 
-    router.push('/tesoro/egresos')
+    router.push('/panel/tesoreria/egresos')
     router.refresh()
-  }
-
-  const estilosCategoriaActiva = {
-    'Intereses': { backgroundColor: '#EAF3DE', borderColor: '#3B6D11', color: '#27500A' },
-    'Donación': { backgroundColor: '#E6F1FB', borderColor: '#185FA5', color: '#0C447C' },
-    'Otros': { backgroundColor: '#F1EFE8', borderColor: '#5F5E5A', color: '#444441' },
   }
 
   return (
     <div style={{ maxWidth: '560px' }}>
 
       <div style={{ marginBottom: '1.5rem' }}>
-        <Link href="/tesoro/egresos" style={{ fontSize: '13px', color: '#888', textDecoration: 'none' }}>
-          ← Volver a movimientos
+        <Link href="/panel/tesoreria/egresos" style={{ fontSize: '12px', color: '#666', textDecoration: 'none', marginBottom: '8px', display: 'inline-block' }}>
+           ← Volver a Egresos
         </Link>
       </div>
 
       <h1 style={{ fontSize: '22px', fontWeight: '500', color: '#1a1a2e', marginBottom: '0.25rem' }}>
-        Registrar ingreso
+        Registrar egreso
       </h1>
       <p style={{ fontSize: '13px', color: '#888', marginBottom: '1.5rem' }}>
-        Registrá un ingreso que no corresponde a cuotas — intereses, donaciones u otros.
+        Registrá un gasto del taller. Quedará guardado en el historial de egresos.
       </p>
 
       {error && (
-        <div style={{ backgroundColor: '#FCEBEB', color: '#791F1F', padding: '0.75rem 1rem', borderRadius: '8px', fontSize: '13px', marginBottom: '1rem' }}>
+        <div style={{
+          backgroundColor: '#FCEBEB',
+          color: '#791F1F',
+          padding: '0.75rem 1rem',
+          borderRadius: '8px',
+          fontSize: '13px',
+          marginBottom: '1rem'
+        }}>
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit}>
+
         <div style={estiloSeccion}>
-          <p style={estiloTituloSeccion}>Detalle del ingreso</p>
+          <p style={estiloTituloSeccion}>Detalle del egreso</p>
 
           {/* Categoría */}
           <div style={{ marginBottom: '12px' }}>
@@ -132,12 +136,12 @@ export default function NuevoIngresoPage() {
               name="descripcion"
               value={form.descripcion}
               onChange={handleChange}
-              placeholder="Ej: Intereses cuenta corriente marzo 2025"
+              placeholder="Ej: Capita mensual al templo — marzo 2025"
               style={estiloInput}
             />
           </div>
 
-          {/* Monto y fecha */}
+          {/* Monto y fecha en fila */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
             <div>
               <label style={estiloLabel}>Monto *</label>
@@ -148,7 +152,7 @@ export default function NuevoIngresoPage() {
                 step="1"
                 value={form.monto}
                 onChange={handleChange}
-                placeholder="Ej: 5000"
+                placeholder="Ej: 18000"
                 style={estiloInput}
               />
             </div>
@@ -175,14 +179,27 @@ export default function NuevoIngresoPage() {
               style={estiloInput}
             />
           </div>
+
         </div>
 
-        {/* Vista previa */}
+        {/* Vista previa del monto */}
         {form.monto && parseFloat(form.monto) > 0 && (
-          <div style={{ backgroundColor: '#EAF3DE', borderRadius: '8px', padding: '0.75rem 1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '13px', color: '#27500A' }}>Total a registrar como ingreso</span>
-            <span style={{ fontSize: '18px', fontWeight: '500', color: '#27500A' }}>
-              +{new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(parseFloat(form.monto))}
+          <div style={{
+            backgroundColor: '#FCEBEB',
+            borderRadius: '8px',
+            padding: '0.75rem 1rem',
+            marginBottom: '1rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <span style={{ fontSize: '13px', color: '#791F1F' }}>Total a registrar como egreso</span>
+            <span style={{ fontSize: '18px', fontWeight: '500', color: '#791F1F' }}>
+              -{new Intl.NumberFormat('es-AR', {
+                style: 'currency',
+                currency: 'ARS',
+                maximumFractionDigits: 0
+              }).format(parseFloat(form.monto))}
             </span>
           </div>
         )}
@@ -191,20 +208,85 @@ export default function NuevoIngresoPage() {
           <button
             type="submit"
             disabled={cargando}
-            style={{ fontSize: '13px', padding: '8px 20px', borderRadius: '8px', border: 'none', backgroundColor: '#1a1a2e', color: '#ffffff', cursor: cargando ? 'not-allowed' : 'pointer', opacity: cargando ? 0.6 : 1 }}
+            style={{
+              ...estiloBotonPrimario,
+              opacity: cargando ? 0.6 : 1,
+              cursor: cargando ? 'not-allowed' : 'pointer'
+            }}
           >
-            {cargando ? 'Guardando...' : 'Guardar ingreso'}
+            {cargando ? 'Guardando...' : 'Guardar egreso'}
           </button>
-          <Link href="/tesoro/egresos" style={{ fontSize: '13px', padding: '8px 20px', borderRadius: '8px', border: '0.5px solid #c8c5b8', backgroundColor: 'transparent', color: '#1a1a2e', textDecoration: 'none', display: 'inline-block' }}>
+          <Link href="/panel/tesoreria" style={estiloBoton}>
             Cancelar
           </Link>
         </div>
+
       </form>
     </div>
   )
 }
 
-const estiloSeccion = { backgroundColor: '#ffffff', border: '0.5px solid #e8e6e0', borderRadius: '12px', padding: '1.25rem', marginBottom: '1rem' }
-const estiloTituloSeccion = { fontSize: '13px', fontWeight: '500', color: '#888', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em' }
-const estiloLabel = { display: 'block', fontSize: '12px', color: '#666', marginBottom: '4px' }
-const estiloInput = { width: '100%', padding: '8px 10px', fontSize: '13px', border: '0.5px solid #c8c5b8', borderRadius: '8px', backgroundColor: '#fafaf8', color: '#1a1a2e', boxSizing: 'border-box' }
+// ─── Estilos ──────────────────────────────────────────────────
+
+const estilosCategoriaActiva = {
+  'SFU':          { backgroundColor: '#EEEDFE', borderColor: '#534AB7', color: '#3C3489' },
+  'Gran Logia':   { backgroundColor: '#E1F5EE', borderColor: '#0F6E56', color: '#085041' },
+  'Gastos varios':{ backgroundColor: '#F1EFE8', borderColor: '#5F5E5A', color: '#444441' },
+}
+
+const estiloSeccion = {
+  backgroundColor: '#ffffff',
+  border: '0.5px solid #e8e6e0',
+  borderRadius: '12px',
+  padding: '1.25rem',
+  marginBottom: '1rem'
+}
+
+const estiloTituloSeccion = {
+  fontSize: '13px',
+  fontWeight: '500',
+  color: '#888',
+  marginBottom: '1rem',
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em'
+}
+
+const estiloLabel = {
+  display: 'block',
+  fontSize: '12px',
+  color: '#666',
+  marginBottom: '4px'
+}
+
+const estiloInput = {
+  width: '100%',
+  padding: '8px 10px',
+  fontSize: '13px',
+  border: '0.5px solid #c8c5b8',
+  borderRadius: '8px',
+  backgroundColor: '#fafaf8',
+  color: '#1a1a2e',
+  boxSizing: 'border-box'
+}
+
+const estiloBotonPrimario = {
+  fontSize: '13px',
+  padding: '8px 20px',
+  borderRadius: '8px',
+  border: 'none',
+  backgroundColor: '#1a1a2e',
+  color: '#ffffff',
+  cursor: 'pointer'
+}
+
+const estiloBoton = {
+  fontSize: '13px',
+  padding: '8px 20px',
+  borderRadius: '8px',
+  border: '0.5px solid #c8c5b8',
+  backgroundColor: 'transparent',
+  color: '#1a1a2e',
+  textDecoration: 'none',
+  cursor: 'pointer',
+  display: 'inline-block'
+}

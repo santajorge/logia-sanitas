@@ -4,69 +4,56 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase'
 
-export default function LoginPage() {
+export default function Login() {
   const router = useRouter()
-  const [form, setForm] = useState({ usuario: '', password: '' })
-  const [error, setError] = useState(null)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
   const [cargando, setCargando] = useState(false)
 
-  function handleChange(e) {
-    const { name, value } = e.target
-    setForm(f => ({ ...f, [name]: value }))
-  }
-
-  async function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setError('')
     setCargando(true)
-    setError(null)
 
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
+    // 1. Supabase valida el email y la contraseña reales
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     })
 
-    if (res.ok) {
-      // Reemplazamos router.push por una redirección tradicional
-      window.location.href = '/tesoro'
-    } else {
-      setError('Usuario o contraseña incorrectos.')
+    if (authError) {
+      setError('Credenciales incorrectas. Verificá tu correo y contraseña.')
       setCargando(false)
+      return
     }
+
+    // 2. Si Supabase aprueba, pedimos la cookie para el middleware
+    await fetch('/api/auth/login', { method: 'POST' })
+
+    // 3. Redirigimos al nuevo panel central
+    router.push('/panel')
+    router.refresh()
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#1C1C1C',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '2rem',
-      fontFamily: "'Montserrat', system-ui, sans-serif"
-    }}>
-
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: '#1C1C1C', fontFamily: "'Montserrat', sans-serif" }}>
+      
       <div style={{ width: '100%', maxWidth: '360px', marginBottom: '1rem' }}>
         <Link href="/" style={{ fontSize: '12px', color: '#9e9b8e', textDecoration: 'none' }}>
           ← Volver a la web pública
         </Link>
       </div>
 
-      {/* Logo */}
       <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
         <Image
-          src="/logo-sanitas.png"
+          src="logo-sanitas.png"
           alt="Logo Logia Sanitas Sanitatum"
           width={130}
           height={130}
-          style={{ 
-            objectFit: 'contain', 
-            marginBottom: '1rem',
-            display: 'block',    
-            margin: '0 auto'   
-          }}
+          style={{ objectFit: 'contain', marginBottom: '1rem', display: 'block', margin: '0 auto' }}
         />
         <p style={{ fontSize: '11px', color: '#CDA434', letterSpacing: '0.2em', marginBottom: '4px' }}>
           A L.·.G.·.D.·.G.·.A.·.D.·.U.·.
@@ -79,102 +66,48 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {/* Formulario */}
-      <div style={{
-        backgroundColor: '#2a2a2a',
-        border: '1px solid #CDA434',
-        borderRadius: '8px',
-        padding: '2rem',
-        width: '100%',
-        maxWidth: '360px'
-      }}>
-        <h1 style={{ fontSize: '16px', fontWeight: '500', color: '#F5F5F5', marginBottom: '1.5rem', textAlign: 'center' }}>
-          Iniciar sesión
-        </h1>
+      <div style={{ backgroundColor: '#2a2a2a', padding: '2.5rem', borderRadius: '12px', width: '100%', maxWidth: '360px', border: '1px solid #CDA434' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          {error && (
+            <div style={{ backgroundColor: '#3a1c1c', color: '#e88e8e', padding: '0.75rem', borderRadius: '8px', fontSize: '13px', textAlign: 'center', border: '1px solid #e88e8e' }}>
+              {error}
+            </div>
+          )}
 
-        {error && (
-          <div style={{
-            backgroundColor: '#FCEBEB',
-            color: '#791F1F',
-            padding: '0.75rem 1rem',
-            borderRadius: '6px',
-            fontSize: '13px',
-            marginBottom: '1rem'
-          }}>
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontSize: '11px', color: '#9e9b8e', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>
-              Usuario
-            </label>
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', color: '#CDA434', marginBottom: '8px' }}>Correo Electrónico</label>
             <input
-              name="usuario"
-              value={form.usuario}
-              onChange={handleChange}
-              autoComplete="username"
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                fontSize: '13px',
-                border: '0.5px solid #444',
-                borderRadius: '6px',
-                backgroundColor: '#1C1C1C',
-                color: '#F5F5F5',
-                boxSizing: 'border-box'
-              }}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="tu@correo.com"
+              style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#1C1C1C', color: '#F5F5F5', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+              required
             />
           </div>
 
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', fontSize: '11px', color: '#9e9b8e', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>
-              Contraseña
-            </label>
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', color: '#CDA434', marginBottom: '8px' }}>Contraseña</label>
             <input
-              name="password"
               type="password"
-              value={form.password}
-              onChange={handleChange}
-              autoComplete="current-password"
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                fontSize: '13px',
-                border: '0.5px solid #444',
-                borderRadius: '6px',
-                backgroundColor: '#1C1C1C',
-                color: '#F5F5F5',
-                boxSizing: 'border-box'
-              }}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#1C1C1C', color: '#F5F5F5', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+              required
             />
           </div>
 
           <button
             type="submit"
             disabled={cargando}
-            style={{
-              width: '100%',
-              padding: '10px',
-              backgroundColor: cargando ? '#a07a28' : '#CDA434',
-              color: '#1C1C1C',
-              border: 'none',
-              borderRadius: '6px',
-              fontWeight: '600',
-              fontSize: '13px',
-              cursor: cargando ? 'not-allowed' : 'pointer',
-              transition: 'background-color 0.2s'
-            }}
+            style={{ marginTop: '0.5rem', backgroundColor: '#CDA434', color: '#1C1C1C', padding: '12px', borderRadius: '6px', border: 'none', fontSize: '14px', fontWeight: '600', cursor: cargando ? 'not-allowed' : 'pointer', transition: 'background-color 0.2s', opacity: cargando ? 0.7 : 1 }}
           >
-            {cargando ? 'Verificando...' : 'Ingresar'}
+            {cargando ? 'Autenticando...' : 'Ingresar al Templo'}
           </button>
         </form>
       </div>
-
-      <p style={{ fontSize: '11px', color: '#555', marginTop: '2rem', textAlign: 'center' }}>
-        Bajo los auspicios de la Gran Logia de la Argentina de Libres y Aceptatos Masones
-      </p>
     </div>
   )
 }

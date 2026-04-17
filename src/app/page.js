@@ -10,7 +10,7 @@ export const metadata = {
   keywords: 'masonería Rosario, logia Rosario, masonería y salud, Sanitas Sanitatum, logia masónica Rosario, masonería Argentina',
   openGraph: {
     title: 'Logia Sanitas Sanitatum N°763 — Masonería en Rosario',
-    description: 'Logia masónica en Rosario dedicada a la salud como derecho universal. Bajo los auspicios de la Gran Logia de la Argentina.',
+    description: 'Logia masónica en Rosario dedicada a la salud como derecho universal. Bajo los auspicios de la Gran Logia de la Argentina de Libres y Aceptados Masones.',
     url: 'https://logiasanitas763.com.ar',
     siteName: 'Logia Sanitas Sanitatum N°763',
     locale: 'es_AR',

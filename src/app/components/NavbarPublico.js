@@ -71,7 +71,7 @@ export default function NavbarPublico() {
           </a>
         ))}
         <Link
-          href="/tesoro"
+          href="/panel/tesoreria"
           style={{
             backgroundColor: hoveredLink === 'reservada' ? '#b8891e' : '#CDA434',
             color: '#1C1C1C',
@@ -144,7 +144,7 @@ export default function NavbarPublico() {
             </a>
           ))}
           <Link
-            href="/tesoro"
+            href="/panel/tesoreria"
             style={{
               backgroundColor: '#CDA434',
               color: '#1C1C1C',

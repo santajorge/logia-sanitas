@@ -96,7 +96,7 @@ export default function NuevoHermanoPage() {
     }
 
     // Si todo salió bien, volvemos al panel principal
-    router.push('/tesoro')
+    router.push('/panel/tesoreria/hermanos')
     router.refresh()
   }
 
@@ -104,11 +104,9 @@ export default function NuevoHermanoPage() {
     <div style={{ maxWidth: '600px' }}>
 
       {/* Encabezado */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.5rem' }}>
-        <Link href="/tesoro" style={{ fontSize: '13px', color: '#888', textDecoration: 'none' }}>
-          ← Volver al panel
-        </Link>
-      </div>
+      <Link href="/panel/tesoreria/hermanos" style={{ fontSize: '12px', color: '#666', textDecoration: 'none', marginBottom: '8px', display: 'inline-block' }}>
+        ← Volver al Cuadro Lógico
+      </Link>
 
       <h1 style={{ fontSize: '22px', fontWeight: '500', color: '#1a1a2e', marginBottom: '0.25rem' }}>
         Nuevo hermano
@@ -285,7 +283,7 @@ export default function NuevoHermanoPage() {
           >
             {cargando ? 'Guardando...' : 'Guardar hermano'}
           </button>
-          <Link href="/tesoro" style={estiloBoton}>
+          <Link href="/panel/tesoreria/hermanos" style={estiloBoton}>
             Cancelar
           </Link>
         </div>

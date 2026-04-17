@@ -19,44 +19,54 @@ export default function ConfiguracionPage() {
     notas: 'Actualización de cuota'
   })
 
-  async function cargarDatos() {
-    setCargando(true)
-    
-    // 1. Traemos los tipos de cuota activos
-    const { data: tipos, error: errTipos } = await supabase
-      .from('tipos_cuota')
-      .select('*')
-      .eq('activo', true)
-      .order('nombre')
-
-    if (errTipos) {
-      console.error('Error al cargar tipos:', errTipos)
-      return
-    }
-
-    // 2. Para cada tipo, buscamos su valor más reciente programado o vigente
-    const tiposConCuota = await Promise.all(tipos.map(async (tipo) => {
-      const { data: cuota } = await supabase
-        .from('cuotas')
-        .select('importe, vigencia_desde, notas')
-        .eq('tipo_cuota_id', tipo.id)
-        .order('vigencia_desde', { ascending: false })
-        .limit(1)
-        .single()
+useEffect(() => {
+    // 1. Metemos la función adentro del useEffect
+    async function cargarDatos() {
+      setCargando(true)
       
-      return { ...tipo, cuotaActual: cuota }
-    }))
+      // Traemos los tipos de cuota activos
+      const { data: tipos, error: errTipos } = await supabase
+        .from('tipos_cuota')
+        .select('*')
+        .eq('activo', true)
+        .order('nombre')
 
-    setTiposCuota(tiposConCuota)
-    if (tiposConCuota.length > 0 && !form.tipo_cuota_id) {
-      setForm(f => ({ ...f, tipo_cuota_id: tiposConCuota.id }))
+      if (errTipos) {
+        console.error('Error al cargar tipos:', errTipos)
+        setCargando(false)
+        return
+      }
+
+      // Para cada tipo, buscamos su valor más reciente
+      const tiposConCuota = await Promise.all(tipos.map(async (tipo) => {
+        const { data: cuota } = await supabase
+          .from('cuotas')
+          .select('importe, vigencia_desde, notas')
+          .eq('tipo_cuota_id', tipo.id)
+          .order('vigencia_desde', { ascending: false })
+          .limit(1)
+          .single()
+        
+        return { ...tipo, cuotaActual: cuota }
+      }))
+
+      setTiposCuota(tiposConCuota)
+      
+      // Seteamos el valor por defecto del formulario
+      setForm(f => {
+        // Solo actualizamos si el form no tiene tipo_cuota_id y hay tipos disponibles
+        if (!f.tipo_cuota_id && tiposConCuota.length > 0) {
+           return { ...f, tipo_cuota_id: tiposConCuota.id }
+        }
+        return f
+      })
+      
+      setCargando(false)
     }
-    setCargando(false)
-  }
 
-  useEffect(() => {
+    // 2. La llamamos
     cargarDatos()
-  }, [])
+  }, []) // El array vacío hace que se ejecute solo al montar el componente
 
   function handleChange(e) {
     const { name, value } = e.target
