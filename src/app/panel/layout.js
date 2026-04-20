@@ -14,12 +14,10 @@ export default function PanelLayout({ children }) {
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
-    // Detectar tamaño de pantalla para el Responsive
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
     checkMobile()
     window.addEventListener('resize', checkMobile)
 
-    // Cargar el rol del usuario desde Supabase
     async function cargarPerfil() {
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
@@ -31,14 +29,15 @@ export default function PanelLayout({ children }) {
         
         if (hermano) setRol(hermano.rol_oficial)
       }
-      setCargando(false)
+      setTimeout(() => {
+        setCargando(false)
+      }, 2800)
     }
 
     cargarPerfil()
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Cierra el menú en móviles cuando hacés clic en un enlace
   const handleLinkClick = () => {
     if (isMobile) setMenuAbierto(false)
   }
@@ -56,7 +55,7 @@ export default function PanelLayout({ children }) {
       <div style={{ minHeight: '100vh', backgroundColor: '#000000', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#CDA434', fontFamily: 'system-ui, sans-serif' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img 
-          src="/templo-cargando.gif" 
+          src="/templo-cargando.gif"
           alt="Abriendo las Puertas" 
           style={{ width: '180px', marginBottom: '1.5rem' }} 
         />
@@ -70,7 +69,7 @@ export default function PanelLayout({ children }) {
   return (
     <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', backgroundColor: '#f5f4f0', fontFamily: 'system-ui, sans-serif' }}>
       
-      {/* BARRA SUPERIOR MOBILE (Solo se ve en celulares) */}
+      {/* BARRA SUPERIOR MOBILE */}
       {isMobile && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#1a1a2e', padding: '1rem', color: '#e8e6e0' }}>
           <span style={{ fontSize: '16px', fontWeight: '500' }}>Logia Sanitas N°763</span>
@@ -104,11 +103,10 @@ export default function PanelLayout({ children }) {
         )}
 
         <nav style={{ padding: '1rem 0', flex: 1, overflowY: 'auto' }}>
-          {/* ACÁ ESTÁ EL PRIMER exacto={true} */}
           <Enlace href="/panel" texto="Panel General" onClick={handleLinkClick} exacto={true} />
           <Enlace href="/panel/mi-perfil" texto="Mi Perfil" onClick={handleLinkClick} />
 
-          {/* CUADRO LÓGICO - Visible para VM, Sec y Tes */}
+          {/* ADMINISTRACIÓN */}
           {(veSecretaria || veTesoreria) && (
             <div style={estiloGrupo}>
               <p style={estiloTituloGrupo}>ADMINISTRACIÓN</p>
@@ -116,22 +114,31 @@ export default function PanelLayout({ children }) {
             </div>
           )}
 
+          {/* SECRETARÍA */}
           {veSecretaria && (
             <div style={estiloGrupo}>
               <p style={estiloTituloGrupo}>SECRETARÍA</p>
-              <Enlace href="/panel/secretaria/candidatos" texto="Candidatos" onClick={handleLinkClick} />
+              <Enlace href="/panel/secretaria/candidatos" texto="Candidatos / Profanos" onClick={handleLinkClick} />
               <Enlace href="/panel/secretaria/tenidas" texto="Tenidas y Asistencia" onClick={handleLinkClick} />
-              <Enlace href="/panel/secretaria/libro-negro" texto="Libro Negro" onClick={handleLinkClick} />
+              
+              {/* Filtro de Seguridad Blindado */}
+              {(rol === 'Secretario' || rol === 'Venerable Maestro') && (
+                <Enlace href="/panel/secretaria/registro-historico" texto="Registro Histórico" onClick={handleLinkClick} />
+              )}
             </div>
           )}
 
+          {/* TESORERÍA */}
           {veTesoreria && (
             <div style={estiloGrupo}>
               <p style={estiloTituloGrupo}>TESORERÍA</p>
-              {/* ACÁ ESTÁ EL SEGUNDO exacto={true} */}
               <Enlace href="/panel/tesoreria" texto="Dashboard Tesoro" onClick={handleLinkClick} exacto={true} />
               <Enlace href="/panel/tesoreria/ingresos" texto="Ingresos" onClick={handleLinkClick} />
               <Enlace href="/panel/tesoreria/egresos" texto="Egresos" onClick={handleLinkClick} />
+              
+              {/* Nuevo menú para cobrar iniciaciones */}
+              <Enlace href="/panel/tesoreria/iniciaciones" texto="Próximas Iniciaciones" onClick={handleLinkClick} />
+              
               <Enlace href="/panel/tesoreria/configuracion" texto="Configuración" onClick={handleLinkClick} />
             </div>
           )}
@@ -168,7 +175,7 @@ export default function PanelLayout({ children }) {
         flex: 1,
         padding: isMobile ? '1rem' : '2rem',
         overflowY: 'auto',
-        display: (isMobile && menuAbierto) ? 'none' : 'block' // Oculta el fondo si el menú está abierto en el celu
+        display: (isMobile && menuAbierto) ? 'none' : 'block'
       }}>
         {children}
       </main>
@@ -177,23 +184,21 @@ export default function PanelLayout({ children }) {
   )
 }
 
-// Subcomponente para que los enlaces queden prolijos
 function Enlace({ href, texto, onClick, exacto = false }) {
   const pathname = usePathname()
-  
-  // Ahora esta línea ya no va a tirar error porque "exacto" sí existe
   const activo = exacto ? pathname === href : (pathname === href || pathname.startsWith(`${href}/`))
 
   return (
     <Link href={href} onClick={onClick} style={{
       display: 'block',
-      padding: '0.6rem 1.25rem',
-      fontSize: '14px',
-      color: activo ? '#ffffff' : '#c8c5b8',
+      padding: '0.75rem 1.25rem',
+      fontSize: '15px',
+      color: activo ? '#ffffff' : '#9e9b8e',
       backgroundColor: activo ? 'rgba(205, 164, 52, 0.1)' : 'transparent',
       borderLeft: activo ? '3px solid #CDA434' : '3px solid transparent',
       textDecoration: 'none',
-      transition: 'all 0.2s'
+      transition: 'all 0.2s',
+      fontWeight: activo ? '500' : '400'
     }}>
       {texto}
     </Link>
