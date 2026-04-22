@@ -92,6 +92,22 @@ export default function SuperDetalleHermano() {
     setGuardandoContacto(false)
   }
 
+  const handleActualizarCampo = async (campo, valor) => {
+    // Actualizamos en Supabase
+    const { error } = await supabase
+      .from('hermanos')
+      .update({ [campo]: valor || null })
+      .eq('id', id)
+
+    // Si sale bien, actualizamos la pantalla para que no haya que recargar
+    if (!error) {
+      setHermano(prev => ({ ...prev, [campo]: valor }))
+    } else {
+      console.error(`Error al guardar ${campo}:`, error)
+      alert("Hubo un error al guardar la fecha.")
+    }
+  }
+
   // ESTA ES LA FUNCIÓN QUE GUARDA EN EL LIBRO NEGRO
   const handleConfirmarBaja = async (e) => {
     e.preventDefault()
@@ -256,6 +272,49 @@ export default function SuperDetalleHermano() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
+
+      {/* TARJETA DE CARRERA MASÓNICA (NUEVO) */}
+        <div style={{ backgroundColor: '#ffffff', border: '1px solid #e8e6e0', borderRadius: '12px', padding: '1.5rem' }}>
+          <h3 style={{ fontSize: '12px', color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 1rem', borderBottom: '1px solid #f0efe9', paddingBottom: '8px' }}>
+            Carrera Masónica
+          </h3>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <div>
+              <label style={{ fontSize: '11px', color: '#666', display: 'block', marginBottom: '4px' }}>FECHA DE INICIACIÓN</label>
+              <input 
+                type="date" 
+                defaultValue={hermano.fecha_iniciacion || ''} 
+                onBlur={(e) => handleActualizarCampo('fecha_iniciacion', e.target.value)}
+                style={estiloInputEdicion}
+              />
+            </div>
+            
+            {Number(hermano.grado) >= 2 && (
+              <div>
+                <label style={{ fontSize: '11px', color: '#666', display: 'block', marginBottom: '4px' }}>FECHA DE AUMENTO DE SALARIO</label>
+                <input 
+                  type="date" 
+                  defaultValue={hermano.fecha_aumento || ''} 
+                  onBlur={(e) => handleActualizarCampo('fecha_aumento', e.target.value)}
+                  style={estiloInputEdicion}
+                />
+              </div>
+            )}
+
+            {Number(hermano.grado) === 3 && (
+              <div>
+                <label style={{ fontSize: '11px', color: '#666', display: 'block', marginBottom: '4px' }}>FECHA DE EXALTACIÓN</label>
+                <input 
+                  type="date" 
+                  defaultValue={hermano.fecha_exaltacion || ''} 
+                  onBlur={(e) => handleActualizarCampo('fecha_exaltacion', e.target.value)}
+                  style={estiloInputEdicion}
+                />
+              </div>
+            )}
+          </div>
+        </div>
         
         {/* VISTA DEL TESORERO */}
         {(esTesorero || esSecretarioOVM) && (
