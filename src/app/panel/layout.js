@@ -2,39 +2,34 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { usePathname, useRouter } from 'next/navigation'
 import BotonLogout from './components/BotonLogout'
+// Importamos el pasaporte y el hook
+import { AuthProvider, useAuth } from '@/context/AuthContext'
 
+// 1. ESTA ES LA CAPA PROTECTORA (Resuelve tu duda de los returns)
 export default function PanelLayout({ children }) {
+  return (
+    <AuthProvider>
+      <LayoutInterno>{children}</LayoutInterno>
+    </AuthProvider>
+  )
+}
+
+// 2. ESTE ES TU CÓDIGO ORIGINAL (Adaptado para leer el pasaporte)
+function LayoutInterno({ children }) {
   const pathname = usePathname()
-  const [rol, setRol] = useState(null)
-  const [cargando, setCargando] = useState(true)
   const [menuAbierto, setMenuAbierto] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  
+  // En vez de buscar en Supabase acá, leemos el contexto global
+  const { usuario, cargandoAuth } = useAuth()
+  const rol = usuario?.rol_oficial
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
     checkMobile()
     window.addEventListener('resize', checkMobile)
-
-    async function cargarPerfil() {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user) {
-        const { data: hermano } = await supabase
-          .from('hermanos')
-          .select('rol_oficial')
-          .eq('user_id', session.user.id)
-          .single()
-        
-        if (hermano) setRol(hermano.rol_oficial)
-      }
-      setTimeout(() => {
-        setCargando(false)
-      }, 2800)
-    }
-
-    cargarPerfil()
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
@@ -50,7 +45,40 @@ export default function PanelLayout({ children }) {
   const veColumnaSur = esVenerable || rol === '1er Vigilante'
   const veColumnaNorte = esVenerable || rol === '2do Vigilante'
 
-  if (cargando) {
+  // --- GUARDA TEMPLO INTERIOR (Protección de Rutas) ---
+  const router = useRouter()
+
+  useEffect(() => {
+    // Si todavía está leyendo el pasaporte, no hacemos nada
+    if (cargandoAuth) return
+
+    // Si el usuario por algún motivo no existe, lo sacamos al login
+    if (!usuario) {
+      router.push('/') // Cambiá esto por la ruta de tu login si es distinta
+      return
+    }
+
+    // Blindaje de cada área: si la ruta empieza con la palabra prohibida y no tiene el rol, ¡afuera!
+    if (pathname.startsWith('/panel/secretaria') && !veSecretaria) {
+      router.push('/panel/mi-perfil')
+    } 
+    else if (pathname.startsWith('/panel/tesoreria') && !veTesoreria) {
+      router.push('/panel/mi-perfil')
+    } 
+    else if (pathname.startsWith('/panel/hospitalario') && !veHospitalario) {
+      router.push('/panel/mi-perfil')
+    } 
+    else if (pathname.startsWith('/panel/columna-norte') && !veColumnaNorte) {
+      router.push('/panel/mi-perfil')
+    } 
+    else if (pathname.startsWith('/panel/columna-sur') && !veColumnaSur) {
+      router.push('/panel/mi-perfil')
+    }
+  }, [pathname, usuario, cargandoAuth, router, veSecretaria, veTesoreria, veHospitalario, veColumnaNorte, veColumnaSur])
+  
+
+  // PRIMER RETURN: PANTALLA DE CARGA
+  if (cargandoAuth) {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#000000', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#CDA434', fontFamily: 'system-ui, sans-serif' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -66,6 +94,7 @@ export default function PanelLayout({ children }) {
     )
   }
 
+  // SEGUNDO RETURN: INTERFAZ COMPLETA
   return (
     <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', backgroundColor: '#f5f4f0', fontFamily: 'system-ui, sans-serif' }}>
       
@@ -120,9 +149,7 @@ export default function PanelLayout({ children }) {
               <p style={estiloTituloGrupo}>SECRETARÍA</p>
               <Enlace href="/panel/secretaria/candidatos" texto="Candidatos / Profanos" onClick={handleLinkClick} />
               <Enlace href="/panel/secretaria/tenidas" texto="Tenidas y Asistencia" onClick={handleLinkClick} />
-              
-              {/* Filtro de Seguridad Blindado */}
-              {(rol === 'Secretario' || rol === 'Venerable Maestro') && (
+              {(rol === 'Secretario' || esVenerable) && (
                 <Enlace href="/panel/secretaria/registro-historico" texto="Registro Histórico" onClick={handleLinkClick} />
               )}
             </div>
@@ -135,14 +162,12 @@ export default function PanelLayout({ children }) {
               <Enlace href="/panel/tesoreria" texto="Dashboard Tesoro" onClick={handleLinkClick} exacto={true} />
               <Enlace href="/panel/tesoreria/ingresos" texto="Ingresos" onClick={handleLinkClick} />
               <Enlace href="/panel/tesoreria/egresos" texto="Egresos" onClick={handleLinkClick} />
-              
-              {/* Nuevo menú para cobrar iniciaciones */}
               <Enlace href="/panel/tesoreria/iniciaciones" texto="Próximas Iniciaciones" onClick={handleLinkClick} />
-              
               <Enlace href="/panel/tesoreria/configuracion" texto="Configuración" onClick={handleLinkClick} />
             </div>
           )}
 
+          {/* HOSPITALARIO */}
           {veHospitalario && (
             <div style={estiloGrupo}>
               <p style={estiloTituloGrupo}>HOSPITALARIO</p>
@@ -150,6 +175,7 @@ export default function PanelLayout({ children }) {
             </div>
           )}
 
+          {/* COLUMNA SUR */}
           {veColumnaSur && (
             <div style={estiloGrupo}>
               <p style={estiloTituloGrupo}>COLUMNA SUR</p>
@@ -157,6 +183,7 @@ export default function PanelLayout({ children }) {
             </div>
           )}
 
+          {/* COLUMNA NORTE */}
           {veColumnaNorte && (
             <div style={estiloGrupo}>
               <p style={estiloTituloGrupo}>COLUMNA NORTE</p>
