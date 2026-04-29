@@ -1,111 +1,160 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { supabase } from '@/lib/supabase'
-import { CalendarDays, Users, BookOpen, ChevronRight } from 'lucide-react'
+import { useAuth } from '@/context/AuthContext'
+import { BookOpen, Users, FileText, CreditCard, Sparkles } from 'lucide-react'
 
-export default function PanelIndex() {
-  const [perfil, setPerfil] = useState(null)
-  const [stats, setStats] = useState({ tenidas: 0, candidatos: 0 })
-  const [cargando, setCargando] = useState(true)
+// --- BIBLIOTECA DE LUZ MASÓNICA (Sin autor, listos para los manuales) ---
+const capsulasMaconicas = [
+  {
+    titulo: "La Piedra Bruta",
+    texto: "Representa al hombre en su estado natural, con sus asperezas e imperfecciones. Nuestro trabajo diario es desbastarla con el mazo de la voluntad y el cincel de la inteligencia para convertirla en una Piedra Cúbica, apta para la construcción del Templo."
+  },
+  {
+    titulo: "El Nivel y la Plomada",
+    texto: "El Nivel nos recuerda que todos los hombres son iguales por naturaleza y están sujetos a las mismas leyes. La Plomada nos enseña a caminar rectamente y mantenernos erguidos en la búsqueda de la verdad, sin desviarnos por intereses egoístas."
+  },
+  {
+    titulo: "La Virtud del Silencio",
+    texto: "El silencio no es simplemente la ausencia de palabras, sino el espacio necesario para que nazca la reflexión. Es en la quietud donde el Masón aprende a escuchar la voz de su conciencia y a gobernar sus pasiones."
+  },
+  {
+    titulo: "La Escuadra y el Compás",
+    texto: "La Escuadra rige nuestras acciones hacia nuestros semejantes, recordándonos la rectitud y la justicia. El Compás traza el límite de nuestros deseos y pasiones, manteniéndonos en los debidos límites con todos los hombres."
+  },
+  {
+    titulo: "La Regla de 24 Pulgadas",
+    texto: "Nos enseña a dividir nuestro día: una parte para el trabajo, otra para el descanso y la familia, y otra para el servicio a nuestros semejantes y nuestro propio desarrollo espiritual e intelectual."
+  }
+]
 
-  useEffect(() => {
-    async function cargarDashboard() {
-      // 1. Obtener usuario actual
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user) {
-        const { data: hermano } = await supabase
-          .from('hermanos')
-          .select('nombre, apellido, rol_oficial, grado')
-          .eq('user_id', session.user.id)
-          .single()
-        setPerfil(hermano)
-      }
+export default function PanelInicio() {
+  const { usuario, cargandoAuth } = useAuth()
 
-      // 2. Traer estadísticas rápidas
-      const { count: countTenidas } = await supabase
-        .from('tenidas')
-        .select('*', { count: 'exact', head: true })
-        .eq('estado', 'abierta')
+  // Calculamos la cápsula directamente sin useEffect. 
+  // Más rápido, más limpio, y VS Code ya no va a quejarse.
+  const diaActual = new Date().getDate()
+  const indice = diaActual % capsulasMaconicas.length
+  const capsulaDelDia = capsulasMaconicas[indice]
 
-      const { count: countCandidatos } = await supabase
-        .from('candidatos')
-        .select('*', { count: 'exact', head: true })
-        // Si querés que solo cuente los activos, podés agregar un .eq() acá
+  if (cargandoAuth) return null
 
-      setStats({
-        tenidas: countTenidas || 0,
-        candidatos: countCandidatos || 0
-      })
-
-      setCargando(false)
-    }
-
-    cargarDashboard()
-  }, [])
-
-  if (cargando) return <div style={{ padding: '2rem', color: '#888' }}>Cargando tablero...</div>
+  const rol = usuario?.rol_oficial
+  const esVenerable = rol === 'Venerable Maestro'
+  const veTesoreria = esVenerable || rol === 'Tesorero'
+  const veSecretaria = esVenerable || rol === 'Secretario'
 
   return (
-    <div style={{ position: 'relative', minHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ maxWidth: '1000px', paddingBottom: '3rem' }}>
       
-      {/* MARCA DE AGUA DEL LOGO EN EL FONDO */}
-      <div style={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)', opacity: 0.03, pointerEvents: 'none', zIndex: 0 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo-sanitas.png" alt="Sello Logia" style={{ width: '450px' }} />
+      {/* Mensaje de Bienvenida */}
+      <div style={{ marginBottom: '2rem', paddingBottom: '1.5rem', borderBottom: '1px solid #e8e6e0' }}>
+        <h1 style={{ fontSize: '28px', color: '#1a1a2e', margin: '0 0 8px', fontWeight: '600' }}>
+          Bienvenido, Q.·. H.·. {usuario?.nombre}
+        </h1>
+        <p style={{ color: '#666', margin: 0, fontSize: '15px' }}>
+          Panel de gestión administrativa y operativa de la Logia Sanitas Sanitatum N° 763.
+        </p>
       </div>
 
-      <div style={{ position: 'relative', zIndex: 1, maxWidth: '1000px', width: '100%' }}>
+      {/* CÁPSULA MASÓNICA DIARIA */}
+      <div style={{ backgroundColor: '#1a1a2e', borderRadius: '12px', padding: '2rem', marginBottom: '2.5rem', color: '#e8e6e0', position: 'relative', overflow: 'hidden', boxShadow: '0 10px 25px rgba(26,26,46,0.1)' }}>
+        <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: '0.05' }}>
+          <Sparkles size={200} />
+        </div>
         
-        {/* SALUDO DINÁMICO */}
-        <div style={{ marginBottom: '3rem', borderBottom: '1px solid #e8e6e0', paddingBottom: '1.5rem' }}>
-          <h1 style={{ fontSize: '28px', fontWeight: '600', color: '#1a1a2e', margin: '0 0 8px' }}>
-            ¡Bienvenido, {perfil?.rol_oficial ? perfil.rol_oficial : `H.·. ${perfil?.nombre}`}!
-          </h1>
-          <p style={{ fontSize: '15px', color: '#666', margin: 0 }}>
-            Panel de Control Administrativo — Logia Sanitas Sanitatum N° 763.
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
+            <Sparkles size={20} color="#CDA434" />
+            <h2 style={{ fontSize: '14px', color: '#CDA434', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0, fontWeight: '600' }}>
+              Reflexión del Día
+            </h2>
+          </div>
+          
+          <h3 style={{ fontSize: '22px', margin: '0 0 1rem', color: '#fff', fontWeight: '500' }}>
+            {capsulaDelDia.titulo}
+          </h3>
+          
+          <p style={{ fontSize: '15px', lineHeight: '1.6', color: '#c4c2ba', fontStyle: 'italic', margin: 0, maxWidth: '800px' }}>
+            "{capsulaDelDia.texto}"
           </p>
         </div>
-
-        {/* TARJETAS DE ACCESO RÁPIDO */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem' }}>
-
-          <Link href="/panel/secretaria/tenidas" style={estiloTarjeta}>
-            <div style={estiloIcono}><CalendarDays size={24} color="#CDA434" /></div>
-            <div>
-              <h3 style={estiloTituloTarjeta}>Tenidas Abiertas</h3>
-              <p style={estiloValorTarjeta}>{stats.tenidas} en registro</p>
-            </div>
-            <ChevronRight size={20} color="#c8c5b8" style={{ marginLeft: 'auto' }} />
-          </Link>
-
-          <Link href="/panel/secretaria/candidatos" style={estiloTarjeta}>
-            <div style={estiloIcono}><Users size={24} color="#CDA434" /></div>
-            <div>
-              <h3 style={estiloTituloTarjeta}>Candidatos</h3>
-              <p style={estiloValorTarjeta}>{stats.candidatos} expedientes</p>
-            </div>
-            <ChevronRight size={20} color="#c8c5b8" style={{ marginLeft: 'auto' }} />
-          </Link>
-
-          <Link href="/panel/tesoreria/hermanos" style={estiloTarjeta}>
-            <div style={estiloIcono}><BookOpen size={24} color="#CDA434" /></div>
-            <div>
-              <h3 style={estiloTituloTarjeta}>Cuadro Lógico</h3>
-              <p style={estiloValorTarjeta}>Gestión del Taller</p>
-            </div>
-            <ChevronRight size={20} color="#c8c5b8" style={{ marginLeft: 'auto' }} />
-          </Link>
-
-        </div>
       </div>
+
+      {/* ACCESOS RÁPIDOS DE OFICIALES (Sólo aparecen si tienen el cargo) */}
+      {(veSecretaria || veTesoreria) && (
+        <div>
+          <h3 style={{ fontSize: '16px', color: '#1a1a2e', marginBottom: '1.2rem', fontWeight: '600' }}>
+            Accesos de Oficialidad
+          </h3>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+            
+            {veSecretaria && (
+              <>
+                <TarjetaAcceso 
+                  href="/panel/secretaria/candidatos" 
+                  icono={<Users size={24} />} 
+                  titulo="Candidatos" 
+                  descripcion="Gestión de profanos" 
+                />
+                <TarjetaAcceso 
+                  href="/panel/secretaria/tenidas" 
+                  icono={<FileText size={24} />} 
+                  titulo="Tenidas" 
+                  descripcion="Control de asistencia" 
+                />
+              </>
+            )}
+
+            {veTesoreria && (
+              <>
+                <TarjetaAcceso 
+                  href="/panel/tesoreria" 
+                  icono={<CreditCard size={24} />} 
+                  titulo="Tesoro" 
+                  descripcion="Dashboard financiero" 
+                />
+                <TarjetaAcceso 
+                  href="/panel/tesoreria/hermanos" 
+                  icono={<BookOpen size={24} />} 
+                  titulo="Cuadro Lógico" 
+                  descripcion="Estado de los HH.·." 
+                />
+              </>
+            )}
+
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
 
-const estiloTarjeta = { display: 'flex', alignItems: 'center', gap: '1.25rem', backgroundColor: '#ffffff', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e8e6e0', textDecoration: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', transition: 'all 0.2s', cursor: 'pointer' }
-const estiloIcono = { backgroundColor: '#fafaf8', padding: '12px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }
-const estiloTituloTarjeta = { fontSize: '12px', color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 4px', fontWeight: '600' }
-const estiloValorTarjeta = { fontSize: '16px', color: '#1a1a2e', fontWeight: '600', margin: 0 }
+// Componente visual para las tarjetas
+function TarjetaAcceso({ href, icono, titulo, descripcion }) {
+  return (
+    <Link href={href} style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '15px',
+      padding: '1.2rem',
+      backgroundColor: '#fff',
+      border: '1px solid #e8e6e0',
+      borderRadius: '12px',
+      textDecoration: 'none',
+      color: '#1a1a2e',
+      transition: 'all 0.2s ease',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+    }}>
+      <div style={{ width: '48px', height: '48px', backgroundColor: '#f0efe9', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#CDA434' }}>
+        {icono}
+      </div>
+      <div>
+        <h4 style={{ margin: '0 0 4px', fontSize: '15px', fontWeight: '600' }}>{titulo}</h4>
+        <p style={{ margin: 0, fontSize: '12px', color: '#888' }}>{descripcion}</p>
+      </div>
+    </Link>
+  )
+}
