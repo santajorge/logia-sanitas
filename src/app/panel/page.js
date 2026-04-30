@@ -3,39 +3,27 @@
 import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
 import { BookOpen, Users, FileText, CreditCard, Sparkles } from 'lucide-react'
+// IMPORTAMOS LA BASE DE DATOS DE FRASES DIRECTO DEL JSON
+import capsulasMaconicas from '@/data/capsulas.json'
 
 // --- BIBLIOTECA DE LUZ MASÓNICA (Sin autor, listos para los manuales) ---
-const capsulasMaconicas = [
-  {
-    titulo: "La Piedra Bruta",
-    texto: "Representa al hombre en su estado natural, con sus asperezas e imperfecciones. Nuestro trabajo diario es desbastarla con el mazo de la voluntad y el cincel de la inteligencia para convertirla en una Piedra Cúbica, apta para la construcción del Templo."
-  },
-  {
-    titulo: "El Nivel y la Plomada",
-    texto: "El Nivel nos recuerda que todos los hombres son iguales por naturaleza y están sujetos a las mismas leyes. La Plomada nos enseña a caminar rectamente y mantenernos erguidos en la búsqueda de la verdad, sin desviarnos por intereses egoístas."
-  },
-  {
-    titulo: "La Virtud del Silencio",
-    texto: "El silencio no es simplemente la ausencia de palabras, sino el espacio necesario para que nazca la reflexión. Es en la quietud donde el Masón aprende a escuchar la voz de su conciencia y a gobernar sus pasiones."
-  },
-  {
-    titulo: "La Escuadra y el Compás",
-    texto: "La Escuadra rige nuestras acciones hacia nuestros semejantes, recordándonos la rectitud y la justicia. El Compás traza el límite de nuestros deseos y pasiones, manteniéndonos en los debidos límites con todos los hombres."
-  },
-  {
-    titulo: "La Regla de 24 Pulgadas",
-    texto: "Nos enseña a dividir nuestro día: una parte para el trabajo, otra para el descanso y la familia, y otra para el servicio a nuestros semejantes y nuestro propio desarrollo espiritual e intelectual."
-  }
-]
 
 export default function PanelInicio() {
   const { usuario, cargandoAuth } = useAuth()
 
-  // Calculamos la cápsula directamente sin useEffect. 
-  // Más rápido, más limpio, y VS Code ya no va a quejarse.
+// 1. Tomamos el grado del usuario (si no cargó, asumimos 1 por seguridad)
+  const gradoUsuario = usuario?.grado || 1
+
+  // 2. Filtramos el JSON para que solo queden las frases de su grado
+  const reflexionesDelGrado = capsulasMaconicas.filter(capsula => capsula.grado === gradoUsuario)
+
+  // 3. Por si acaso se olvidaron de cargar frases para algún grado, usamos un Plan B
+  const arrayAUsar = reflexionesDelGrado.length > 0 ? reflexionesDelGrado : capsulasMaconicas
+
+  // 4. Elegimos la cápsula del día basada SÓLO en las de su grado
   const diaActual = new Date().getDate()
-  const indice = diaActual % capsulasMaconicas.length
-  const capsulaDelDia = capsulasMaconicas[indice]
+  const indice = diaActual % arrayAUsar.length
+  const capsulaDelDia = arrayAUsar[indice]
 
   if (cargandoAuth) return null
 
@@ -76,7 +64,7 @@ export default function PanelInicio() {
           </h3>
           
           <p style={{ fontSize: '15px', lineHeight: '1.6', color: '#c4c2ba', fontStyle: 'italic', margin: 0, maxWidth: '800px' }}>
-            "{capsulaDelDia.texto}"
+            &quot;{capsulaDelDia.texto}&quot;
           </p>
         </div>
       </div>

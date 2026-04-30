@@ -30,7 +30,7 @@ export default function ColumnaSurPage() {
       const { data: dataObreros, error: errO } = await supabase
         .from('hermanos')
         .select(`
-          id, nombre, apellido, email, telefono, created_at, fecha_iniciacion,
+          id, nombre, apellido, email, telefono, created_at, fecha_aumento,
           planchas (id, titulo, estado, fecha_presentacion, fecha_lectura)
         `)
         .eq('grado', 2)

@@ -65,7 +65,7 @@ export default function HomePage() {
             maxWidth: '560px', lineHeight: '1.7', marginBottom: '2rem',
             fontFamily: 'Georgia, serif'
           }}>
-            "Forjando la salud como un derecho universal, con Sabiduría, Justicia y Solidaridad"
+            &quot;Forjando la salud como un derecho universal, con Sabiduría, Justicia y Solidaridad&quot;
           </p>
           <a
             href="https://masoneria-argentina.org.ar"
