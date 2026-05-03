@@ -149,8 +149,12 @@ export default function SuperDetalleHermano() {
   if (cargando) return <p style={{ padding: '2rem', color: '#888' }}>Cargando Ficha del Hermano...</p>
   if (!hermano) return <p style={{ padding: '2rem', color: '#A32D2D' }}>Hermano no encontrado.</p>
 
-  const esTesorero = usuarioActual?.rol_oficial === 'Tesorero'
-  const esSecretarioOVM = usuarioActual?.rol_oficial === 'Secretario' || usuarioActual?.rol_oficial === 'Venerable Maestro'
+  const rol = usuarioActual?.rol_oficial?.trim().toLowerCase() || ''
+  const esTesorero = rol === 'tesorero'
+  const esSecretarioOVM = rol === 'secretario' || rol === 'venerable maestro'
+  // Si querés que el Secretario o el VM también puedan cargar pagos por si el Tesorero no está, usá esta constante para el botón:
+  const puedeCargarPagos = esTesorero || esSecretarioOVM
+
   const gradoTexto = Number(hermano.grado) === 3 ? 'Maestro' : Number(hermano.grado) === 2 ? 'Compañero' : 'Aprendiz'
 
   return (
@@ -323,7 +327,7 @@ export default function SuperDetalleHermano() {
               <h3 style={{ fontSize: '14px', margin: 0, color: '#1a1a2e', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <CreditCard size={18} color="#CDA434" /> Historial de Tesorería
               </h3>
-              {esTesorero && (
+              {puedeCargarPagos && (
                 <Link href={`/panel/tesoreria/hermanos/${id}/pago`} style={{ backgroundColor: '#3B6D11', color: '#fff', fontSize: '12px', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none', fontWeight: '500' }}>
                   + Registrar Pago
                 </Link>
