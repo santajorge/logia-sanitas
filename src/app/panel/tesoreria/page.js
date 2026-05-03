@@ -2,8 +2,35 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { Send } from 'lucide-react' // Opcional: un ícono lindo para el botón
 
 export default function DashboardTesoro() {
+  // --- LÓGICA DE NOTIFICACIONES ---
+  const [enviando, setEnviando] = useState(false)
+
+  const handleEnviarRecordatorios = async () => {
+    // Alerta para evitar que se envíe por hacer un clic accidental
+    if (!window.confirm('¿Estás seguro de enviar el Estado de Cuenta actual a TODOS los hermanos activos?')) return;
+    
+    setEnviando(true)
+    try {
+      // Reemplazá 'TU_CRON_SECRET' por la contraseña que tengas en tu .env.local
+      // Ej: logia763sanitas2025
+      const response = await fetch('/api/tesoreria/notificar?secret=logia763sanitas2025')
+      const data = await response.json()
+      
+      if (data.ok) {
+        alert(`¡Excelente! Se enviaron ${data.enviados} correos exitosamente.`)
+      } else {
+        alert(`Hubo un problema: ${data.error}`)
+      }
+    } catch (error) {
+      alert('Error de conexión al intentar enviar las notificaciones.')
+    } finally {
+      setEnviando(false)
+    }
+  }
+  // --------------------------------
   // Sumamos balanceHistorico al estado inicial
   const [stats, setStats] = useState({ activos: 0, deudaTotal: 0, ingresosMes: 0, egresosMes: 0, balanceHistorico: 0 })
   const [ultimosIngresos, setUltimosIngresos] = useState([])
@@ -78,6 +105,31 @@ export default function DashboardTesoro() {
         <h1 style={{ fontSize: '22px', fontWeight: '500', color: '#1a1a2e', marginBottom: '4px' }}>Dashboard de Tesorería</h1>
         <p style={{ fontSize: '13px', color: '#888' }}>Resumen financiero de {mesActual} (E.·. V.·.) y estado general del Taller.</p>
       </div>
+
+      {/* BOTÓN DE ENVIAR ESTADOS DE CUENTA */}
+        <button 
+          onClick={handleEnviarRecordatorios} 
+          disabled={enviando} 
+          style={{ 
+            backgroundColor: '#1a1a2e', 
+            color: '#CDA434', 
+            padding: '10px 20px', 
+            borderRadius: '8px', 
+            border: '1px solid #CDA434', 
+            cursor: enviando ? 'not-allowed' : 'pointer', 
+            fontWeight: '600', 
+            fontSize: '13px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            opacity: enviando ? 0.7 : 1,
+            transition: 'all 0.2s',
+            marginBottom: '2.5rem' /* <--- ACÁ ESTÁ EL AIRE QUE FALTABA */
+          }}
+        >
+          <Send size={16} />
+          {enviando ? 'Enviando correos...' : 'Notificar Estados de Cuenta'}
+        </button>
 
       {/* GRID DE TARJETAS ACTUALIZADO CON FONDO TOTAL */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
