@@ -353,28 +353,55 @@ export default function SuperDetalleHermano() {
           </div>
         )}
 
-        {/* VISTA DEL SECRETARIO/VM */}
-        {esSecretarioOVM && (
+        {/* VISTA DEL TESORERO */}
+        {(esTesorero || esSecretarioOVM) && (
           <div style={{ backgroundColor: '#ffffff', border: '1px solid #e8e6e0', borderRadius: '12px', overflow: 'hidden' }}>
-            <div style={{ padding: '1.25rem', borderBottom: '1px solid #e8e6e0', backgroundColor: '#fafaf8' }}>
+            <div style={{ padding: '1.25rem', borderBottom: '1px solid #e8e6e0', backgroundColor: '#fafaf8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h3 style={{ fontSize: '14px', margin: 0, color: '#1a1a2e', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <CalendarDays size={18} color="#CDA434" /> Últimas Asistencias
+                <CreditCard size={18} color="#CDA434" /> Historial de Tesorería
               </h3>
+              {puedeCargarPagos && (
+                <Link href={`/panel/tesoreria/hermanos/${id}/pago`} style={{ backgroundColor: '#3B6D11', color: '#fff', fontSize: '12px', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none', fontWeight: '500' }}>
+                  + Registrar Pago
+                </Link>
+              )}
             </div>
             <div style={{ padding: '1rem' }}>
-              {asistencias.length === 0 ? (
-                <p style={{ fontSize: '13px', color: '#888', margin: 0 }}>No hay registro de asistencias.</p>
+              {pagos.length === 0 ? (
+                <p style={{ fontSize: '13px', color: '#888', margin: 0 }}>No hay pagos recientes registrados.</p>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {asistencias.map(a => (
-                    <div key={a.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '8px', backgroundColor: '#fafaf8', borderRadius: '6px' }}>
-                      <span style={{ color: '#1a1a2e' }}>Tenida {a.tenidas?.tipo} ({new Date(a.tenidas?.fecha + 'T00:00:00').toLocaleDateString('es-AR')})</span>
-                      <span style={{ fontWeight: '600', color: a.estado === 'presente' ? '#3B6D11' : a.estado === 'ausente_justificado' ? '#854F0B' : '#A32D2D' }}>
-                        {a.estado === 'presente' ? 'Presente' : a.estado === 'ausente_justificado' ? 'Justificado' : 'Ausente'}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                  <tbody>
+                    {pagos.map(p => (
+                      <tr key={p.id} style={{ borderBottom: '1px solid #f0efe9' }}>
+                        <td style={{ padding: '8px 0', color: '#666' }}>{new Date(p.fecha + 'T00:00:00').toLocaleDateString('es-AR')}</td>
+                        <td style={{ padding: '8px 0', color: '#1a1a2e', fontWeight: '500' }}>${p.monto}</td>
+                        <td style={{ padding: '8px 0', color: '#888', textAlign: 'center' }}>{p.notas || '—'}</td>
+                        
+                        {/* NUEVA COLUMNA CON EL BOTÓN DE ANULAR */}
+                        <td style={{ padding: '8px 0', textAlign: 'right' }}>
+                          {esTesorero && (
+                            <button 
+                              onClick={() => handleAnularPago(p.id, p.monto)}
+                              style={{ 
+                                background: 'none', 
+                                border: 'none', 
+                                color: '#A32D2D', 
+                                cursor: 'pointer', 
+                                fontSize: '12px', 
+                                textDecoration: 'underline', 
+                                fontWeight: '600' 
+                              }}
+                            >
+                              Anular
+                            </button>
+                          )}
+                        </td>
+
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               )}
             </div>
           </div>

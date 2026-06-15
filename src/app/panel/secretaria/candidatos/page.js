@@ -73,7 +73,7 @@ export default function TableroCandidatos() {
     }
   }
 
-  // --- LÓGICA DE RECHAZO (REGISTRO HISTÓRICO) ---
+// --- LÓGICA DE RECHAZO (REGISTRO HISTÓRICO) ---
   const confirmarRechazo = async (e) => {
     e.preventDefault()
     setGuardandoRechazo(true)
@@ -84,19 +84,21 @@ export default function TableroCandidatos() {
       // 1. Cambiamos el estado del candidato para sacarlo del tablero
       const { error: errCand } = await supabase
         .from('candidatos')
-        .update({ estado: 'rechazado' }) // Opcional: sumar un campo activo: false si lo tenés
+        .update({ estado: 'rechazado' }) 
         .eq('id', candId)
 
       if (errCand) throw errCand
 
-      // 2. Lo mandamos al Registro Histórico
+      // 2. Lo mandamos al Registro Histórico. 
+      // IMPORTANTE: Nos aseguramos de NO mandar 'hermano_id' para que Supabase no intente validarlo.
       const { error: errLibro } = await supabase
         .from('libro_negro')
         .insert({
           tipo_de_registro: 'candidato',
-          candidato_id: candId,
-          fecha_resolucion: new Date().toISOString().split('T'),
-          motivo: modalRechazo.motivo.trim()
+          candidato_id: candId, // Ahora guardamos el ID en la columna correcta que creamos en Supabase
+          // Guardamos el nombre en el motivo para no perder nunca el rastro si el candidato se borra a futuro
+          motivo: `RECHAZO DE ADMISIÓN: Profano ${modalRechazo.candidato?.nombre} ${modalRechazo.candidato?.apellido}. \nMotivo: ${modalRechazo.motivo.trim()}`,
+          fecha_resolucion: new Date().toISOString().split('T')[0]
         })
 
       if (errLibro) throw errLibro
@@ -104,10 +106,11 @@ export default function TableroCandidatos() {
       // 3. Limpiamos la pantalla
       setCandidatos(prev => prev.filter(c => c.id !== candId))
       setModalRechazo({ visible: false, candidato: null, motivo: '' })
+      alert('Candidato rechazado y enviado al Libro Negro exitosamente.')
       
     } catch (error) {
-      console.error(error)
-      alert('Error al procesar el rechazo.')
+      console.error('Error detallado de Supabase:', error)
+      alert('Error al procesar el rechazo. Revisá la consola para más detalles.')
     } finally {
       setGuardandoRechazo(false)
     }
