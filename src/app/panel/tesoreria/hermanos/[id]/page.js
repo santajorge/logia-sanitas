@@ -146,6 +146,38 @@ export default function SuperDetalleHermano() {
     }
   }
 
+  const handleAnularPago = async (pagoId, monto) => {
+    const confirmar = window.confirm(`¿Estás seguro de que querés anular este pago por $${monto}?`)
+    if (!confirmar) return
+
+    try {
+      // Primero: Borrar el pago de la tabla 'pagos'
+      const { error: errorPago } = await supabase
+        .from('pagos')
+        .delete()
+        .eq('id', pagoId)
+
+      if (errorPago) throw errorPago
+
+      // Segundo: Descontar el saldo al hermano
+      const { error: errorSaldo } = await supabase.rpc('restar_saldo_hermano', {
+        p_hermano_id: id,
+        p_monto: monto
+      })
+
+      if (errorSaldo) throw errorSaldo
+
+      // Actualizar la vista sin recargar
+      setPagos(prev => prev.filter(p => p.id !== pagoId))
+      alert('Pago anulado y saldo actualizado correctamente.')
+
+    } catch (error) {
+      console.error('Error al anular el pago:', error)
+      alert('Hubo un error al anular el pago.')
+    }
+  }
+
+
   if (cargando) return <p style={{ padding: '2rem', color: '#888' }}>Cargando Ficha del Hermano...</p>
   if (!hermano) return <p style={{ padding: '2rem', color: '#A32D2D' }}>Hermano no encontrado.</p>
 
@@ -320,92 +352,51 @@ export default function SuperDetalleHermano() {
           </div>
         </div>
         
-        {/* VISTA DEL TESORERO */}
-        {(esTesorero || esSecretarioOVM) && (
-          <div style={{ backgroundColor: '#ffffff', border: '1px solid #e8e6e0', borderRadius: '12px', overflow: 'hidden' }}>
-            <div style={{ padding: '1.25rem', borderBottom: '1px solid #e8e6e0', backgroundColor: '#fafaf8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ fontSize: '14px', margin: 0, color: '#1a1a2e', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <CreditCard size={18} color="#CDA434" /> Historial de Tesorería
-              </h3>
-              {puedeCargarPagos && (
-                <Link href={`/panel/tesoreria/hermanos/${id}/pago`} style={{ backgroundColor: '#3B6D11', color: '#fff', fontSize: '12px', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none', fontWeight: '500' }}>
-                  + Registrar Pago
-                </Link>
-              )}
-            </div>
-            <div style={{ padding: '1rem' }}>
-              {pagos.length === 0 ? (
-                <p style={{ fontSize: '13px', color: '#888', margin: 0 }}>No hay pagos recientes registrados.</p>
-              ) : (
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                  <tbody>
-                    {pagos.map(p => (
-                      <tr key={p.id} style={{ borderBottom: '1px solid #f0efe9' }}>
-                        <td style={{ padding: '8px 0', color: '#666' }}>{new Date(p.fecha + 'T00:00:00').toLocaleDateString('es-AR')}</td>
-                        <td style={{ padding: '8px 0', color: '#1a1a2e', fontWeight: '500' }}>${p.monto}</td>
-                        <td style={{ padding: '8px 0', color: '#888', textAlign: 'right' }}>{p.notas || '—'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
+      {/* VISTA DE TESORERÍA */}
+      {(esTesorero || esSecretarioOVM) && (
+        <div style={{ backgroundColor: '#ffffff', border: '1px solid #e8e6e0', borderRadius: '12px', overflow: 'hidden' }}>
+          <div style={{ padding: '1.25rem', borderBottom: '1px solid #e8e6e0', backgroundColor: '#fafaf8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ fontSize: '14px', margin: 0, color: '#1a1a2e', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <CreditCard size={18} color="#CDA434" /> Historial de Tesorería
+            </h3>
+            {puedeCargarPagos && (
+              <Link href={`/panel/tesoreria/hermanos/${id}/pago`} style={{ backgroundColor: '#3B6D11', color: '#fff', fontSize: '12px', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none', fontWeight: '500' }}>
+                + Registrar Pago
+              </Link>
+            )}
           </div>
-        )}
-
-        {/* VISTA DEL TESORERO */}
-        {(esTesorero || esSecretarioOVM) && (
-          <div style={{ backgroundColor: '#ffffff', border: '1px solid #e8e6e0', borderRadius: '12px', overflow: 'hidden' }}>
-            <div style={{ padding: '1.25rem', borderBottom: '1px solid #e8e6e0', backgroundColor: '#fafaf8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ fontSize: '14px', margin: 0, color: '#1a1a2e', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <CreditCard size={18} color="#CDA434" /> Historial de Tesorería
-              </h3>
-              {puedeCargarPagos && (
-                <Link href={`/panel/tesoreria/hermanos/${id}/pago`} style={{ backgroundColor: '#3B6D11', color: '#fff', fontSize: '12px', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none', fontWeight: '500' }}>
-                  + Registrar Pago
-                </Link>
-              )}
-            </div>
-            <div style={{ padding: '1rem' }}>
-              {pagos.length === 0 ? (
-                <p style={{ fontSize: '13px', color: '#888', margin: 0 }}>No hay pagos recientes registrados.</p>
-              ) : (
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                  <tbody>
-                    {pagos.map(p => (
-                      <tr key={p.id} style={{ borderBottom: '1px solid #f0efe9' }}>
-                        <td style={{ padding: '8px 0', color: '#666' }}>{new Date(p.fecha + 'T00:00:00').toLocaleDateString('es-AR')}</td>
-                        <td style={{ padding: '8px 0', color: '#1a1a2e', fontWeight: '500' }}>${p.monto}</td>
-                        <td style={{ padding: '8px 0', color: '#888', textAlign: 'center' }}>{p.notas || '—'}</td>
-                        
-                        {/* NUEVA COLUMNA CON EL BOTÓN DE ANULAR */}
-                        <td style={{ padding: '8px 0', textAlign: 'right' }}>
-                          {esTesorero && (
-                            <button 
-                              onClick={() => handleAnularPago(p.id, p.monto)}
-                              style={{ 
-                                background: 'none', 
-                                border: 'none', 
-                                color: '#A32D2D', 
-                                cursor: 'pointer', 
-                                fontSize: '12px', 
-                                textDecoration: 'underline', 
-                                fontWeight: '600' 
-                              }}
-                            >
-                              Anular
-                            </button>
-                          )}
-                        </td>
-
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
+          <div style={{ padding: '1rem' }}>
+            {pagos.length === 0 ? (
+              <p style={{ fontSize: '13px', color: '#888', margin: 0 }}>No hay pagos recientes registrados.</p>
+            ) : (
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                <tbody>
+                  {pagos.map(p => (
+                    <tr key={p.id} style={{ borderBottom: '1px solid #f0efe9' }}>
+                      <td style={{ padding: '8px 0', color: '#666' }}>{new Date(p.fecha + 'T00:00:00').toLocaleDateString('es-AR')}</td>
+                      <td style={{ padding: '8px 0', color: '#1a1a2e', fontWeight: '500' }}>${p.monto}</td>
+                      <td style={{ padding: '8px 0', color: '#888', textAlign: 'center' }}>{p.notas || '—'}</td>
+                      
+                      {/* COLUMNA DE ACCIONES */}
+                      <td style={{ padding: '8px 0', textAlign: 'right' }}>
+                        {/* Si querés que el Secretario también anule, cambiá "esTesorero" por "puedeCargarPagos" */}
+                        {esTesorero && (
+                          <button 
+                            onClick={() => handleAnularPago(p.id, p.monto)}
+                            style={{ background: 'none', border: 'none', color: '#A32D2D', cursor: 'pointer', fontSize: '12px', textDecoration: 'underline', fontWeight: '600' }}
+                          >
+                            Anular
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
-        )}
+        </div>
+      )}        
 
       </div>
     </div>

@@ -75,46 +75,44 @@ export default function TableroCandidatos() {
 
 // --- LÓGICA DE RECHAZO (REGISTRO HISTÓRICO) ---
   const confirmarRechazo = async (e) => {
-    e.preventDefault()
-    setGuardandoRechazo(true)
+  e.preventDefault()
+  setGuardandoRechazo(true)
 
-    const candId = modalRechazo.candidato.id
+  const candId = modalRechazo.candidato.id
 
-    try {
-      // 1. Cambiamos el estado del candidato para sacarlo del tablero
-      const { error: errCand } = await supabase
-        .from('candidatos')
-        .update({ estado: 'rechazado' }) 
-        .eq('id', candId)
+  try {
+    // 1. Cambiamos el estado del candidato para sacarlo de la vista principal (Soft Delete)
+    const { error: errCand } = await supabase
+      .from('candidatos')
+      .update({ estado: 'rechazado' }) 
+      .eq('id', candId)
 
-      if (errCand) throw errCand
+    if (errCand) throw errCand
 
-      // 2. Lo mandamos al Registro Histórico. 
-      // IMPORTANTE: Nos aseguramos de NO mandar 'hermano_id' para que Supabase no intente validarlo.
-      const { error: errLibro } = await supabase
-        .from('libro_negro')
-        .insert({
-          tipo_de_registro: 'candidato',
-          candidato_id: candId, // Ahora guardamos el ID en la columna correcta que creamos en Supabase
-          // Guardamos el nombre en el motivo para no perder nunca el rastro si el candidato se borra a futuro
-          motivo: `RECHAZO DE ADMISIÓN: Profano ${modalRechazo.candidato?.nombre} ${modalRechazo.candidato?.apellido}. \nMotivo: ${modalRechazo.motivo.trim()}`,
-          fecha_resolucion: new Date().toISOString().split('T')[0]
-        })
+    // 2. Lo registramos en el Libro Negro
+    const { error: errLibro } = await supabase
+      .from('libro_negro')
+      .insert({
+        tipo_registro: 'Profano Rechazado', // El valor exacto que pide el CHECK constraint
+        candidato_id: candId,
+        motivo: `RECHAZO DE ADMISIÓN: Profano ${modalRechazo.candidato?.nombre} ${modalRechazo.candidato?.apellido}. \nMotivo: ${modalRechazo.motivo.trim()}`,
+        fecha_resolucion: new Date().toISOString().split('T')[0]
+      })
 
-      if (errLibro) throw errLibro
+    if (errLibro) throw errLibro
 
-      // 3. Limpiamos la pantalla
-      setCandidatos(prev => prev.filter(c => c.id !== candId))
-      setModalRechazo({ visible: false, candidato: null, motivo: '' })
-      alert('Candidato rechazado y enviado al Libro Negro exitosamente.')
-      
-    } catch (error) {
-      console.error('Error detallado de Supabase:', error)
-      alert('Error al procesar el rechazo. Revisá la consola para más detalles.')
-    } finally {
-      setGuardandoRechazo(false)
-    }
+    // 3. Limpiamos la pantalla
+    setCandidatos(prev => prev.filter(c => c.id !== candId))
+    setModalRechazo({ visible: false, candidato: null, motivo: '' })
+    alert('Candidato rechazado y registrado en el Libro Negro exitosamente.')
+    
+  } catch (error) {
+    console.error('Error detallado de Supabase:', error)
+    alert('Error al procesar el rechazo. Revisá la consola para más detalles.')
+  } finally {
+    setGuardandoRechazo(false)
   }
+}
 
   if (cargando) return <p style={{ fontSize: '13px', color: '#888', padding: '2rem' }}>Cargando tablero...</p>
 

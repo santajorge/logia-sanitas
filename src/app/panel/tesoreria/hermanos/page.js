@@ -38,47 +38,6 @@ export default function HermanosPage() {
       setCargando(false)
     }
 
-    const handleAnularPago = async (pagoId, monto) => {
-    if (!window.confirm(`¿Estás seguro de anular este pago de $${monto}? Se descontará el importe del saldo del hermano.`)) return;
-
-    try {
-      // 1. Borramos el pago del registro
-      const { error: errPago } = await supabase
-        .from('pagos')
-        .delete()
-        .eq('id', pagoId)
-
-      if (errPago) throw errPago
-
-      // 2. Revertimos el saldo del hermano (le restamos el pago erróneo)
-      const nuevoSaldo = Number(hermano.saldo) - Number(monto)
-      const { error: errSaldo } = await supabase
-        .from('hermanos')
-        .update({ saldo: nuevoSaldo })
-        .eq('id', hermano.id)
-
-        if (errSaldo) throw errSaldo
-
-        // 3. Dejamos registro en la auditoría para la transparencia de la Logia
-        await supabase.from('auditoria').insert({
-          accion: 'anulacion_pago',
-          hermano_id: hermano.id,
-          monto: monto,
-          detalle: `Anulación de pago por error de carga. Se restaron $${monto} del saldo.`,
-          usuario: usuarioActual?.rol_oficial || 'Sistema'
-        })
-
-        // 4. Actualizamos la pantalla sin recargar
-        setPagos(pagos.filter(p => p.id !== pagoId))
-        setHermano(prev => ({ ...prev, saldo: nuevoSaldo }))
-        alert('Pago anulado correctamente.')
-
-      } catch (error) {
-        console.error('Error al anular pago:', error)
-        alert('Hubo un error al intentar anular el pago.')
-      }
-    }
-
     cargarDatos()
   }, [])
 

@@ -40,12 +40,16 @@ export default function MiPerfilPage() {
         
         let ultimoMesPagoStr = 'Sin registros'
         const pagos = data.pagos || []
+        
         if (pagos.length > 0) {
           const pagosOrdenados = pagos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-          const ultimoPago = pagosOrdenados
-          // Corrección en la lectura de la fecha
-          const [yyyy, mm] = ultimoPago.fecha.split('T').split('-')
-          ultimoMesPagoStr = `${mm}/${yyyy}`
+          const ultimoPago = pagosOrdenados[0] 
+          
+          if (ultimoPago && ultimoPago.fecha) {
+            const fechaLimpia = ultimoPago.fecha.split('T')[0]
+            const [yyyy, mm] = fechaLimpia.split('-')
+            ultimoMesPagoStr = `${mm}/${yyyy}`
+          }
         }
 
         // --- TRAZADOS ---
