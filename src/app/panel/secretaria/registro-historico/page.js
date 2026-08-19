@@ -29,12 +29,12 @@ export default function RegistroHistoricoPage() {
         return
       }
 
-      // 2. Traer los datos cruzando las tablas para obtener los nombres
+      // 2. Traer los datos cruzando las tablas (CORREGIDO)
       const { data, error } = await supabase
         .from('libro_negro')
         .select(`
           id, 
-          tipo_de_registro, 
+          tipo_registro, /* <-- Corregido el nombre de la columna */
           fecha_resolucion, 
           acta_nro, 
           motivo,
@@ -42,6 +42,9 @@ export default function RegistroHistoricoPage() {
           candidatos (nombre, apellido)
         `)
         .order('fecha_resolucion', { ascending: false })
+
+      // Agregamos este console.log para atrapar cualquier error futuro
+      if (error) console.error("Error al cargar Libro Negro:", error.message)
 
       if (data) setRegistros(data)
       setCargando(false)
@@ -91,13 +94,15 @@ export default function RegistroHistoricoPage() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {registros.map(reg => {
+            {registros.map(reg => {
             
-            // Lógica para saber de quién estamos hablando
-            const esHermano = reg.tipo_de_registro === 'hermano'
+            // Lógica actualizada para los nuevos términos de la DB
+            const esHermano = reg.tipo_registro && reg.tipo_registro.includes('Hermano')
+            
+            // Si las relaciones (hermanos/candidatos) vienen nulas, evitamos que la app se rompa
             const nombreCompleto = esHermano 
-              ? `${reg.hermanos?.apellido}, ${reg.hermanos?.nombre}`
-              : `${reg.candidatos?.apellido}, ${reg.candidatos?.nombre}`
+              ? `${reg.hermanos?.apellido || 'N/A'}, ${reg.hermanos?.nombre || 'N/A'}`
+              : `${reg.candidatos?.apellido || 'N/A'}, ${reg.candidatos?.nombre || 'N/A'}`
             
             return (
               <div key={reg.id} style={{ backgroundColor: '#ffffff', border: '1px solid #e8e6e0', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
@@ -110,7 +115,8 @@ export default function RegistroHistoricoPage() {
                       {nombreCompleto}
                     </h3>
                     <span style={{ fontSize: '11px', fontWeight: '600', padding: '3px 8px', borderRadius: '6px', backgroundColor: esHermano ? '#FCEBEB' : '#FAEEDA', color: esHermano ? '#A32D2D' : '#854F0B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {esHermano ? 'Baja de Hermano' : 'Candidato Rechazado'}
+                      {/* Mostramos el tipo exacto que viene de la DB */}
+                      {reg.tipo_registro} 
                     </span>
                   </div>
                   
